@@ -1,196 +1,237 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <title>Quản lý sinh viên</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<meta charset="UTF-8">
+<title>Admin - Quản lý sinh viên</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet"/>
 
-    <style>
-        body {
-            background: linear-gradient(135deg, #ff9ecf, #ffc0e6);
-            min-height: 100vh;
-        }
+<style>
+body{
+    background: linear-gradient(135deg,#ff9ecf,#ffc2e2);
+    min-height:100vh;
+}
 
-        .card-custom {
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        }
+.dashboard-card{
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.15);
+}
 
-        .btn-pink {
-            background-color: #ff4fa3;
-            color: white;
-            border-radius: 20px;
-        }
+.stat-card{
+    background:white;
+    border-radius:20px;
+    padding:20px;
+    text-align:center;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
 
-        .btn-pink:hover {
-            background-color: #e83e8c;
-            color: white;
-        }
+.btn-pink{
+    background:#ff4fa3;
+    color:white;
+    border-radius:25px;
+}
+.btn-pink:hover{
+    background:#e83e8c;
+}
 
-        table tbody tr:hover {
-            background-color: #ffe6f2;
-            transition: 0.3s;
-        }
-
-        h3 {
-            font-weight: bold;
-            color: #d63384;
-        }
-    </style>
+table tbody tr:hover{
+    background:#ffe6f2;
+    transition:0.3s;
+}
+</style>
 </head>
 
-<body class="container py-5">
+<body class="container py-4">
 
-<div class="card card-custom p-4">
-    <h3 class="text-center mb-4">🌸 QUẢN LÝ SINH VIÊN 🌸</h3>
+<div class="dashboard-card bg-white p-4 animate__animated animate__fadeIn">
 
-    <div class="d-flex justify-content-between mb-3">
-        <input type="text" id="search" class="form-control w-50"
-               placeholder="🔍 Tìm theo tên..." onkeyup="searchStudent()">
+<h3 class="text-center text-danger fw-bold mb-4">
+🌸 ADMIN DASHBOARD - QUẢN LÝ SINH VIÊN 🌸
+</h3>
 
-        <button class="btn btn-pink" data-bs-toggle="modal"
-                data-bs-target="#addModal">
+<!-- STAT -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h5>Tổng sinh viên</h5>
+            <h2 id="totalStudent" class="text-danger fw-bold">0</h2>
+        </div>
+    </div>
+
+    <div class="col-md-8 text-end">
+        <button class="btn btn-pink" data-bs-toggle="modal" data-bs-target="#addModal">
             ➕ Thêm sinh viên
         </button>
     </div>
-
-    <table class="table table-bordered text-center align-middle">
-        <thead class="table-danger">
-        <tr>
-            <th>ID</th>
-            <th>Tên</th>
-            <th>Email</th>
-            <th>Hành động</th>
-        </tr>
-        </thead>
-        <tbody id="studentTable"></tbody>
-    </table>
 </div>
 
-<!-- Modal Thêm -->
+<input type="text" id="search" class="form-control mb-3"
+       placeholder="🔍 Tìm kiếm theo tên..."
+       onkeyup="searchStudent()">
+
+<table class="table table-bordered text-center align-middle">
+<thead class="table-danger">
+<tr>
+<th>ID</th>
+<th>Tên</th>
+<th>Email</th>
+<th>Hành động</th>
+</tr>
+</thead>
+<tbody id="studentTable"></tbody>
+</table>
+
+</div>
+
+<!-- ADD MODAL -->
 <div class="modal fade" id="addModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">Thêm sinh viên</h5>
-            </div>
-            <div class="modal-body">
-                <input id="name" class="form-control mb-2" placeholder="Tên">
-                <input id="email" class="form-control" placeholder="Email">
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-pink" onclick="addStudent()">Lưu</button>
-            </div>
-        </div>
-    </div>
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header bg-danger text-white">
+<h5>Thêm sinh viên</h5>
+</div>
+<div class="modal-body">
+<input id="name" class="form-control mb-2" placeholder="Tên">
+<input id="email" class="form-control" placeholder="Email">
+</div>
+<div class="modal-footer">
+<button class="btn btn-pink" onclick="addStudent()">Lưu</button>
+</div>
+</div>
+</div>
 </div>
 
-<!-- Modal Update -->
+<!-- UPDATE MODAL -->
 <div class="modal fade" id="updateModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-warning">
-                <h5 class="modal-title">Cập nhật sinh viên</h5>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="updateId">
-                <input id="updateName" class="form-control mb-2">
-                <input id="updateEmail" class="form-control">
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-warning" onclick="updateStudent()">Cập nhật</button>
-            </div>
-        </div>
-    </div>
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header bg-warning">
+<h5>Cập nhật sinh viên</h5>
+</div>
+<div class="modal-body">
+<input type="hidden" id="updateId">
+<input id="updateName" class="form-control mb-2">
+<input id="updateEmail" class="form-control">
+</div>
+<div class="modal-footer">
+<button class="btn btn-warning" onclick="updateStudent()">Cập nhật</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- TOAST -->
+<div class="position-fixed bottom-0 end-0 p-3">
+<div id="toast" class="toast align-items-center text-bg-success border-0">
+<div class="d-flex">
+<div class="toast-body">Thành công 🎉</div>
+<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+</div>
+</div>
 </div>
 
 <script>
-const API = "http://localhost:8080/api/students";
+const API="http://localhost:8080/api/students";
 
-function loadStudents() {
-    fetch(API)
-        .then(res => res.json())
-        .then(data => {
-            let html = "";
-            data.forEach(s => {
-                html += `
-                <tr>
-                    <td>${s.id}</td>
-                    <td>${s.name}</td>
-                    <td>${s.email}</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning"
-                            onclick="openUpdate(${s.id},'${s.name}','${s.email}')">
-                            ✏
-                        </button>
-                        <button class="btn btn-sm btn-danger"
-                            onclick="deleteStudent(${s.id})">
-                            🗑
-                        </button>
-                    </td>
-                </tr>`;
-            });
-            document.getElementById("studentTable").innerHTML = html;
-        });
+function showToast(){
+    const toast=new bootstrap.Toast(document.getElementById('toast'));
+    toast.show();
 }
 
-function addStudent() {
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
+function loadStudents(){
+fetch(API)
+.then(res=>res.json())
+.then(data=>{
+    document.getElementById("totalStudent").innerText=data.length;
 
-    fetch(API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email })
-    }).then(() => {
-        location.reload();
+    let html="";
+    data.forEach(s=>{
+        html+=`
+        <tr class="animate__animated animate__fadeInUp">
+            <td>${s.id}</td>
+            <td>${s.name}</td>
+            <td>${s.email}</td>
+            <td>
+                <button class="btn btn-sm btn-warning"
+                onclick="openUpdate(${s.id},'${s.name}','${s.email}')">✏</button>
+                <button class="btn btn-sm btn-danger"
+                onclick="deleteStudent(${s.id})">🗑</button>
+            </td>
+        </tr>`;
     });
+    document.getElementById("studentTable").innerHTML=html;
+});
 }
 
-function deleteStudent(id) {
-    if(confirm("Bạn có chắc muốn xóa?")) {
-        fetch(API + "/delete/" + id, { method: "POST" })
-            .then(() => loadStudents());
-    }
+function addStudent(){
+const name=document.getElementById("name").value;
+const email=document.getElementById("email").value;
+
+fetch(API,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({name,email})
+})
+.then(()=>{
+bootstrap.Modal.getInstance(document.getElementById('addModal')).hide();
+showToast();
+loadStudents();
+});
 }
 
-function openUpdate(id,name,email) {
-    document.getElementById("updateId").value = id;
-    document.getElementById("updateName").value = name;
-    document.getElementById("updateEmail").value = email;
-
-    new bootstrap.Modal(document.getElementById('updateModal')).show();
+function deleteStudent(id){
+if(confirm("Bạn chắc chắn muốn xóa?")){
+fetch(API+"/delete/"+id,{method:"POST"})
+.then(()=>{
+showToast();
+loadStudents();
+});
+}
 }
 
-function updateStudent() {
-    const id = document.getElementById("updateId").value;
-    const name = document.getElementById("updateName").value;
-    const email = document.getElementById("updateEmail").value;
-
-    fetch(API + "/update/" + id, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email })
-    }).then(() => location.reload());
+function openUpdate(id,name,email){
+document.getElementById("updateId").value=id;
+document.getElementById("updateName").value=name;
+document.getElementById("updateEmail").value=email;
+new bootstrap.Modal(document.getElementById('updateModal')).show();
 }
 
-function searchStudent() {
-    const name = document.getElementById("search").value;
-    fetch(API + "/search?name=" + name)
-        .then(res => res.json())
-        .then(data => {
-            let html = "";
-            data.forEach(s => {
-                html += `
-                <tr>
-                    <td>${s.id}</td>
-                    <td>${s.name}</td>
-                    <td>${s.email}</td>
-                    <td></td>
-                </tr>`;
-            });
-            document.getElementById("studentTable").innerHTML = html;
-        });
+function updateStudent(){
+const id=document.getElementById("updateId").value;
+const name=document.getElementById("updateName").value;
+const email=document.getElementById("updateEmail").value;
+
+fetch(API+"/update/"+id,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({name,email})
+})
+.then(()=>{
+bootstrap.Modal.getInstance(document.getElementById('updateModal')).hide();
+showToast();
+loadStudents();
+});
+}
+
+function searchStudent(){
+const name=document.getElementById("search").value;
+if(name===""){loadStudents();return;}
+
+fetch(API+"/search?name="+name)
+.then(res=>res.json())
+.then(data=>{
+let html="";
+data.forEach(s=>{
+html+=`
+<tr>
+<td>${s.id}</td>
+<td>${s.name}</td>
+<td>${s.email}</td>
+<td></td>
+</tr>`;
+});
+document.getElementById("studentTable").innerHTML=html;
+});
 }
 
 loadStudents();
