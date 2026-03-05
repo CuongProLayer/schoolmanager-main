@@ -11,4 +11,3 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
     // Search sinh viên theo tên (không phân biệt hoa thường)
     List<Student> findByNameContainingIgnoreCase(String name);
 }
-

@@ -25,23 +25,29 @@
     <tbody id="studentTable"></tbody>
 </table>
 
-<h4>Thêm sinh viên</h4>
+<h4>Thêm / Cập nhật sinh viên</h4>
 
-<!-- ❌ KHÔNG CÓ INPUT ID -->
+<!-- ✅ BẮT BUỘC PHẢI CÓ -->
+<input type="hidden" id="studentId">
+
 <input id="name" class="form-control mb-2" placeholder="Tên sinh viên">
 <input id="email" class="form-control mb-2" placeholder="Email">
 
-<button class="btn btn-primary" onclick="addStudent()">Thêm</button>
+<button class="btn btn-primary" onclick="saveStudent()">Lưu</button>
 
 <script>
 const API = "http://localhost:8080/api/students";
 
+// ========================
 // LOAD DANH SÁCH
+// ========================
 function loadStudents() {
     fetch(API)
         .then(res => res.json())
         .then(data => {
+
             let html = "";
+
             data.forEach(s => {
                 html += `
                 <tr>
@@ -49,63 +55,122 @@ function loadStudents() {
                     <td>${s.name}</td>
                     <td>${s.email}</td>
                     <td>
+                        <button class="btn btn-warning btn-sm"
+                            onclick="editStudent(${s.id}, '${s.name}', '${s.email}')">
+                            Sửa
+                        </button>
+
                         <button class="btn btn-danger btn-sm"
-                            onclick="deleteStudent(${s.id})">Xóa</button>
+                            onclick="deleteStudent(${s.id})">
+                            Xóa
+                        </button>
                     </td>
                 </tr>`;
             });
+
             document.getElementById("studentTable").innerHTML = html;
         });
 }
 
-// ✅ THÊM SINH VIÊN (FORM → @RequestParam)
-function addStudent() {
+// ========================
+// THÊM + CẬP NHẬT
+// ========================
+function saveStudent() {
+
+    const id = document.getElementById("studentId").value;
     const name = document.getElementById("name").value;
     const email = document.getElementById("email").value;
 
-    const formData = new URLSearchParams();
-    formData.append("name", name);
-    formData.append("email", email);
+    const student = { name, email };
 
-    fetch(API + "/add", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: formData.toString()
-    })
-    .then(() => {
-        document.getElementById("name").value = "";
-        document.getElementById("email").value = "";
-        loadStudents();
-    });
+    // Nếu có ID → UPDATE
+    if (id) {
+        fetch(API + "/update/" + id, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(student)
+        }).then(() => {
+            resetForm();
+            loadStudents();
+        });
+
+    } else { // Nếu không có ID → THÊM
+        fetch(API, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(student)
+        }).then(() => {
+            resetForm();
+            loadStudents();
+        });
+    }
 }
 
-// ✅ XÓA SINH VIÊN
+// ========================
+// XÓA SINH VIÊN
+// ========================
 function deleteStudent(id) {
+
     fetch(API + "/delete/" + id, {
-        method: "DELETE"
+        method: "POST"
     }).then(() => loadStudents());
 }
 
-// 🔍 SEARCH
+// ========================
+// ĐỔ DỮ LIỆU LÊN FORM
+// ========================
+function editStudent(id, name, email) {
+    document.getElementById("studentId").value = id;
+    document.getElementById("name").value = name;
+    document.getElementById("email").value = email;
+}
+
+// ========================
+// SEARCH
+// ========================
 function searchStudent() {
+
     const name = document.getElementById("search").value;
+
     fetch(API + "/search?name=" + name)
         .then(res => res.json())
         .then(data => {
+
             let html = "";
+
             data.forEach(s => {
                 html += `
                 <tr>
                     <td>${s.id}</td>
                     <td>${s.name}</td>
                     <td>${s.email}</td>
-                    <td></td>
+                    <td>
+                        <button class="btn btn-warning btn-sm"
+                            onclick="editStudent(${s.id}, '${s.name}', '${s.email}')">
+                            Sửa
+                        </button>
+
+                        <button class="btn btn-danger btn-sm"
+                            onclick="deleteStudent(${s.id})">
+                            Xóa
+                        </button>
+                    </td>
                 </tr>`;
             });
+
             document.getElementById("studentTable").innerHTML = html;
         });
+}
+
+// RESET FORM
+function resetForm() {
+    document.getElementById("studentId").value = "";
+    document.getElementById("name").value = "";
+    document.getElementById("email").value = "";
 }
 
 loadStudents();

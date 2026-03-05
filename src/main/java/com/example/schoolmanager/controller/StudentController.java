@@ -2,8 +2,6 @@ package com.example.schoolmanager.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,103 +13,96 @@ import com.example.schoolmanager.service.StudentService;
 @CrossOrigin
 public class StudentController {
 
-    @Autowired
-    private StudentService service;
+    private final StudentService service;
 
-    // ===============================
-    // ➕ THÊM SINH VIÊN (JSON - FETCH)
-    // ===============================
+    public StudentController(StudentService service) {
+        this.service = service;
+    }
+
+    // =========================================
+    // YÊU CẦU 1 (1 điểm) - THÊM SINH VIÊN
+    // POST: /api/students
+    // =========================================
     @PostMapping
     public ResponseEntity<?> addStudent(@RequestBody Student student) {
 
         if (student.getName() == null || student.getName().trim().isEmpty()) {
             return ResponseEntity.badRequest()
-                    .body("❌ Tên sinh viên không được để trống");
+                    .body("Tên sinh viên không được để trống");
         }
-
-        Student saved = service.addStudent(student);
-        return ResponseEntity.ok(saved);
-    }
-
-    // ==================================
-    // ➕ THÊM SINH VIÊN (FORM HTML)
-    // ==================================
-    @PostMapping("/add")
-    public ResponseEntity<?> addStudentForm(
-            @RequestParam String name,
-            @RequestParam(required = false) String email) {
-
-        Student student = new Student();
-        student.setName(name);
-        student.setEmail(email);
 
         return ResponseEntity.ok(service.addStudent(student));
     }
 
-    // ===============================
-    // ✏️ SỬA SINH VIÊN
-    // ===============================
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateStudent(
-            @PathVariable int id,
-            @RequestBody Student newStudent) {
+    // =========================================
+    // YÊU CẦU 2 (1 điểm) - XÓA SINH VIÊN
+    // POST: /api/students/delete/{id}
+    // =========================================
+    @PostMapping("/delete/{id}")
+    public ResponseEntity<?> deleteStudent(@PathVariable int id) {
 
         Student student = service.getStudentById(id);
+
         if (student == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("❌ Không tìm thấy sinh viên với ID = " + id);
-        }
-
-        student.setName(newStudent.getName());
-        student.setEmail(newStudent.getEmail());
-
-        return ResponseEntity.ok(service.addStudent(student));
-    }
-
-    // ===============================
-    // ❌ XÓA SINH VIÊN
-    // ===============================
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteStudent(@PathVariable int id) {
-
-        Student student = service.getStudentById(id);
-        if (student == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("❌ Không tìm thấy sinh viên với ID = " + id);
+            return ResponseEntity.notFound().build();
         }
 
         service.deleteStudent(id);
-        return ResponseEntity.ok("✅ Đã xóa: " + student.getName());
+        return ResponseEntity.ok("Đã xóa sinh viên ID = " + id);
     }
 
-    // ===============================
-    // 🔍 TÌM KIẾM
-    // ===============================
+    // =========================================
+    // YÊU CẦU 3 (1 điểm) - TÌM KIẾM
+    // GET: /api/students/search?name=abc
+    // =========================================
     @GetMapping("/search")
     public List<Student> searchStudent(@RequestParam String name) {
         return service.findByName(name);
     }
 
-    // ===============================
-    // 📋 DANH SÁCH
-    // ===============================
+    // =========================================
+    // YÊU CẦU 4 (1 điểm) - LẤY THEO ID
+    // GET: /api/students/{id}
+    // =========================================
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getStudentById(@PathVariable int id) {
+
+        Student student = service.getStudentById(id);
+
+        if (student == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(student);
+    }
+
+    // =========================================
+    // YÊU CẦU 5 (1 điểm) - GET ALL
+    // GET: /api/students
+    // =========================================
     @GetMapping
     public List<Student> getAllStudents() {
         return service.getAll();
     }
 
-    // ===============================
-    // 📌 GET BY ID
-    // ===============================
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getStudentById(@PathVariable int id) {
+    // =========================================
+    // YÊU CẦU 6 (1 điểm) - CẬP NHẬT
+    // POST: /api/students/update/{id}
+    // =========================================
+    @PostMapping("/update/{id}")
+    public ResponseEntity<?> updateStudent(
+            @PathVariable int id,
+            @RequestBody Student newStudent) {
 
         Student student = service.getStudentById(id);
+
         if (student == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("❌ Không tìm thấy sinh viên với ID = " + id);
+            return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(student);
+        student.setName(newStudent.getName());
+        student.setEmail(newStudent.getEmail());
+
+        return ResponseEntity.ok(service.updateStudent(student));
     }
 }
